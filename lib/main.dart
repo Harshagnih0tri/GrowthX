@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
-import 'features/dashboard/presentation/dashboard_screen.dart';
-
+import 'core/router/app_shell.dart';
 void main() {
   runApp(const GrowthXApp());
 }
@@ -15,7 +14,7 @@ class GrowthXApp extends StatelessWidget {
       title: 'GrowthX',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const DashboardScreen(),
+      home: const AppShell(),
     );
   }
 }
