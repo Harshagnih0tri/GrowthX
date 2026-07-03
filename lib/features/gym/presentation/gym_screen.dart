@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../dashboard/presentation/widgets/summary_card.dart';
 
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
@@ -7,8 +8,45 @@ class GymScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Gym')),
-      body: const Center(
-        child: Text('Gym Screen'),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Gym Dashboard',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: SummaryCard(
+                      icon: Icons.fitness_center,
+                      title: 'Status',
+                      value: 'Done',
+                      color: Colors.orangeAccent,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SummaryCard(
+                      icon: Icons.local_fire_department,
+                      title: 'Calories',
+                      value: '420 kcal',
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
