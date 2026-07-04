@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../dashboard/presentation/widgets/habit_row.dart';
+import '../data/habit_notifier.dart';
 
-class HabitsScreen extends StatelessWidget {
+class HabitsScreen extends ConsumerWidget {
   const HabitsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final habits = ref.watch(habitProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Habits')),
       body: SafeArea(
@@ -16,19 +20,15 @@ class HabitsScreen extends StatelessWidget {
             children: [
               const Text(
                 'All Habits',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(height: 12),
-              const HabitRow(title: 'Read 20 pages', isDone: true),
-              const HabitRow(title: 'Meditate 10 mins', isDone: false),
-              const HabitRow(title: 'No junk food', isDone: true),
-              const HabitRow(title: 'Sleep before 12 AM', isDone: false),
-              const HabitRow(title: 'Drink 3L water', isDone: true),
-              const HabitRow(title: 'Morning walk', isDone: false),
+              for (int i = 0; i < habits.length; i++)
+                HabitRow(
+                  title: habits[i].title,
+                  isDone: habits[i].isDone,
+                  onTap: () => ref.read(habitProvider.notifier).toggleHabit(i),
+                ),
             ],
           ),
         ),
