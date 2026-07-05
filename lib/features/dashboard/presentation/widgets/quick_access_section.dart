@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/widgets/section_header.dart';
 import '../../../journal/presentation/journal_screen.dart';
 
 class QuickAccessSection extends StatelessWidget {
@@ -9,21 +13,41 @@ class QuickAccessSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Quick Access',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        const SectionHeader(title: 'Quick Access'),
         const SizedBox(height: 12),
-        Card(
-          color: const Color(0xFF1E1E1E),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: ListTile(
-            leading: const Icon(Icons.book, color: Colors.amberAccent),
-            title: const Text('Daily Journal', style: TextStyle(color: Colors.white)),
-            trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const JournalScreen()));
-            },
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const JournalScreen()),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                border: Border.all(color: AppColors.surfaceBorder, width: 1),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.journal.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    ),
+                    child: const Icon(Icons.auto_stories_rounded, color: AppColors.journal, size: 22),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  const Expanded(
+                    child: Text('Daily Journal', style: AppTextStyles.body),
+                  ),
+                  const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+                ],
+              ),
+            ),
           ),
         ),
       ],

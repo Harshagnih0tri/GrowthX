@@ -35,6 +35,7 @@ class RecentSessionsSection extends StatelessWidget {
           return StudySessionTile(
             subject: session.subject,
             duration: session.duration,
+            time: 'Today',
           );
         }),
       ],

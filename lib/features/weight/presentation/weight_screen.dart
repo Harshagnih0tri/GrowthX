@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../dashboard/presentation/widgets/summary_card.dart';
 import '../data/weight_notifier.dart';
 import 'widgets/weight_entry_tile.dart';
+import '../../../shared/widgets/section_header.dart';
+import '../../../shared/widgets/empty_state.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 
 class WeightScreen extends ConsumerWidget {
   const WeightScreen({super.key});
@@ -14,20 +18,16 @@ class WeightScreen extends ConsumerWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1E1E1E),
-          title: const Text('Log Weight', style: TextStyle(color: Colors.white)),
+          title: const Text('Log Weight'),
           content: TextField(
             controller: weightController,
-            style: const TextStyle(color: Colors.white),
+            autofocus: true,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(labelText: 'Weight (kg)'),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            ElevatedButton(
               onPressed: () {
                 final weight = double.tryParse(weightController.text.trim());
                 if (weight != null && weight > 0) {
@@ -52,62 +52,64 @@ class WeightScreen extends ConsumerWidget {
     final changeText = change == null
         ? '--'
         : '${change >= 0 ? '+' : ''}${change.toStringAsFixed(1)} kg';
+    final changeColor = change == null
+        ? AppColors.textSecondary
+        : (change <= 0 ? AppColors.success : AppColors.error);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Weight')),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddWeightDialog(context, ref),
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Log Weight'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxl,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Weight Dashboard',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
+              const SectionHeader(title: 'Overview'),
+              const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   Expanded(
                     child: SummaryCard(
-                      icon: Icons.monitor_weight,
+                      icon: Icons.monitor_weight_rounded,
                       title: 'Current',
                       value: latest == null ? '--' : '${latest.toStringAsFixed(1)} kg',
-                      color: Colors.purpleAccent,
+                      color: AppColors.weight,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: SummaryCard(
-                      icon: Icons.trending_up,
+                      icon: Icons.trending_up_rounded,
                       title: 'Change',
                       value: changeText,
-                      color: Colors.cyanAccent,
+                      color: changeColor,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              const Text(
-                'History',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.xl),
+              const SectionHeader(title: 'History'),
+              const SizedBox(height: AppSpacing.md),
               if (entries.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Text('No entries yet. Tap + to log your weight.', style: TextStyle(color: Colors.grey[500])),
-                ),
-              for (final entry in entries)
-                WeightEntryTile(
-                  weight: '${entry.weightKg.toStringAsFixed(1)} kg',
-                  date: '${entry.date.day}/${entry.date.month}/${entry.date.year}',
-                  onDelete: () => ref.read(weightProvider.notifier).deleteEntry(entry.id!),
-                ),
+                const EmptyState(
+                  icon: Icons.monitor_weight_outlined,
+                  title: 'No entries yet',
+                  subtitle: 'Tap "Log Weight" to start tracking',
+                )
+              else
+                for (final entry in entries)
+                  WeightEntryTile(
+                    weight: '${entry.weightKg.toStringAsFixed(1)} kg',
+                    date: '${entry.date.day}/${entry.date.month}/${entry.date.year}',
+                    onDelete: () => ref.read(weightProvider.notifier).deleteEntry(entry.id!),
+                  ),
             ],
           ),
         ),

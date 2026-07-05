@@ -1,46 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'habit_row.dart';
+import '../../../../shared/widgets/section_header.dart';
+import '../../../../shared/widgets/empty_state.dart';
+import '../../../habits/data/habit_notifier.dart';
+import '../../../habits/presentation/habits_screen.dart';
 
-class _HabitData {
-  final String title;
-  final bool isDone;
-
-  const _HabitData({
-    required this.title,
-    required this.isDone,
-  });
-}
-
-class TodayHabitsSection extends StatelessWidget {
+class TodayHabitsSection extends ConsumerWidget {
   const TodayHabitsSection({super.key});
 
-  static const List<_HabitData> _habits = [
-    _HabitData(title: 'Read 20 pages', isDone: true),
-    _HabitData(title: 'Meditate 10 mins', isDone: false),
-    _HabitData(title: 'No junk food', isDone: true),
-    _HabitData(title: 'Sleep before 12 AM', isDone: false),
-  ];
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final habits = ref.watch(habitProvider);
+    final doneCount = habits.where((h) => h.isDone).length;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Today's Habits",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+        SectionHeader(
+          title: "Today's Habits",
+          trailing: TextButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HabitsScreen()),
+            ),
+            child: Text(habits.isEmpty ? 'Manage' : '$doneCount/${habits.length}'),
           ),
         ),
         const SizedBox(height: 12),
-        ..._habits.map((habit) {
-          return HabitRow(
-            title: habit.title,
-            isDone: habit.isDone,
-          );
-        }),
+        if (habits.isEmpty)
+          const EmptyState(
+            icon: Icons.check_circle_outline_rounded,
+            title: 'No habits yet',
+            subtitle: 'Tap Manage to create your first habit',
+          )
+        else
+          for (int i = 0; i < habits.length; i++)
+            HabitRow(
+              title: habits[i].title,
+              isDone: habits[i].isDone,
+              onTap: () => ref.read(habitProvider.notifier).toggleHabit(i),
+            ),
       ],
     );
   }

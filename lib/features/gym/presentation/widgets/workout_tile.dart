@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 class WorkoutTile extends StatelessWidget {
   final String exercise;
   final String detail;
+  final String calories;
   final VoidCallback? onDelete;
 
   const WorkoutTile({
     super.key,
     required this.exercise,
     required this.detail,
+    required this.calories,
     this.onDelete,
   });
 

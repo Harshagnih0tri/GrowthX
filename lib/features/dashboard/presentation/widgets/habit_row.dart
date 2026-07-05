@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 class HabitRow extends StatelessWidget {
   final String title;
@@ -16,38 +19,54 @@ class HabitRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              isDone ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: isDone ? Colors.greenAccent : Colors.grey[500],
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.white,
-                  decoration: isDone ? TextDecoration.lineThrough : null,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            border: Border.all(color: AppColors.surfaceBorder, width: 1),
+          ),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDone ? AppColors.habit : Colors.transparent,
+                  border: Border.all(
+                    color: isDone ? AppColors.habit : AppColors.textTertiary,
+                    width: 2,
+                  ),
+                ),
+                child: isDone
+                    ? const Icon(Icons.check, size: 14, color: Colors.black)
+                    : null,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTextStyles.body.copyWith(
+                    color: isDone ? AppColors.textTertiary : AppColors.textPrimary,
+                    decoration: isDone ? TextDecoration.lineThrough : null,
+                  ),
                 ),
               ),
-            ),
-            if (onDelete != null)
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
-                onPressed: onDelete,
-              ),
-          ],
+              if (onDelete != null)
+                IconButton(
+                  icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
+                  onPressed: onDelete,
+                ),
+            ],
+          ),
         ),
       ),
     );

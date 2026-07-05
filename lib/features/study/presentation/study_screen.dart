@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../dashboard/presentation/widgets/summary_card.dart';
 import '../data/study_notifier.dart';
 import 'widgets/study_session_tile.dart';
+import '../../../shared/widgets/section_header.dart';
+import '../../../shared/widgets/empty_state.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 
 class StudyScreen extends ConsumerWidget {
   const StudyScreen({super.key});
@@ -15,30 +19,26 @@ class StudyScreen extends ConsumerWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1E1E1E),
-          title: const Text('Add Study Session', style: TextStyle(color: Colors.white)),
+          title: const Text('Add Study Session'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: subjectController,
-                style: const TextStyle(color: Colors.white),
+                autofocus: true,
                 decoration: const InputDecoration(labelText: 'Subject'),
               ),
+              const SizedBox(height: AppSpacing.md),
               TextField(
                 controller: durationController,
-                style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Duration (minutes)'),
               ),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            ElevatedButton(
               onPressed: () {
                 final subject = subjectController.text.trim();
                 final duration = int.tryParse(durationController.text.trim()) ?? 0;
@@ -65,59 +65,59 @@ class StudyScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Study')),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddSessionDialog(context, ref),
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Log Session'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxl,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Study Dashboard',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
+              const SectionHeader(title: 'Today'),
+              const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   Expanded(
                     child: SummaryCard(
-                      icon: Icons.timer,
-                      title: 'Today',
+                      icon: Icons.timer_rounded,
+                      title: 'Time studied',
                       value: '${hours}h ${minutes}m',
-                      color: Colors.blueAccent,
+                      color: AppColors.study,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: SummaryCard(
-                      icon: Icons.menu_book,
+                      icon: Icons.menu_book_rounded,
                       title: 'Subjects',
                       value: '$todaySubjects',
-                      color: Colors.tealAccent,
+                      color: AppColors.info,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              const Text(
-                'Recent Sessions',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.xl),
+              const SectionHeader(title: 'Recent Sessions'),
+              const SizedBox(height: AppSpacing.md),
               if (sessions.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Text('No sessions yet. Tap + to add one.', style: TextStyle(color: Colors.grey[500])),
-                ),
-              for (final session in sessions)
-                StudySessionTile(
-                  subject: session.subject,
-                  duration: '${session.durationMinutes} min',
-                  onDelete: () => ref.read(studyProvider.notifier).deleteSession(session.id!),
-                ),
+                const EmptyState(
+                  icon: Icons.menu_book_outlined,
+                  title: 'No sessions logged',
+                  subtitle: 'Tap "Log Session" to record your study time',
+                )
+              else
+                for (final session in sessions)
+                  StudySessionTile(
+                    subject: session.subject,
+                    duration: '${session.durationMinutes} min',
+                    time: '${session.date.day}/${session.date.month}/${session.date.year}',
+                    onDelete: () => ref.read(studyProvider.notifier).deleteSession(session.id!),
+                  ),
             ],
           ),
         ),

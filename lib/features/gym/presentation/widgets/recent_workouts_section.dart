@@ -1,43 +1,63 @@
 import 'package:flutter/material.dart';
-import 'workout_tile.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_spacing.dart';
 
-class _WorkoutData {
+class WorkoutTile extends StatelessWidget {
   final String exercise;
   final String detail;
+  final String calories;
+  final VoidCallback? onDelete;
 
-  const _WorkoutData({required this.exercise, required this.detail});
-}
-
-class RecentWorkoutsSection extends StatelessWidget {
-  const RecentWorkoutsSection({super.key});
-
-  static const List<_WorkoutData> _workouts = [
-    _WorkoutData(exercise: 'Bench Press', detail: '4x8'),
-    _WorkoutData(exercise: 'Squats', detail: '3x10'),
-    _WorkoutData(exercise: 'Deadlift', detail: '3x5'),
-  ];
+  const WorkoutTile({
+    super.key,
+    required this.exercise,
+    required this.detail,
+    required this.calories,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Recent Workouts',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(color: AppColors.surfaceBorder, width: 1),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.gym.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            ),
+            child: const Icon(Icons.sports_gymnastics_rounded, color: AppColors.gym, size: 20),
           ),
-        ),
-        const SizedBox(height: 12),
-        ..._workouts.map((workout) {
-          return WorkoutTile(
-            exercise: workout.exercise,
-            detail: workout.detail,
-          );
-        }),
-      ],
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(exercise, style: AppTextStyles.body),
+                Text('$detail · $calories kcal', style: AppTextStyles.caption),
+              ],
+            ),
+          ),
+          if (onDelete != null)
+            InkWell(
+              onTap: onDelete,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+              child: const Padding(
+                padding: EdgeInsets.all(4),
+                child: Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

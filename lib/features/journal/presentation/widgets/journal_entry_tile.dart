@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 class JournalEntryTile extends StatelessWidget {
   final String title;
@@ -18,21 +21,51 @@ class JournalEntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: const Color(0xFF1E1E1E),
-      margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         onTap: onTap,
-        leading: const Icon(Icons.book, color: Colors.amberAccent),
-        title: Text(title, style: const TextStyle(color: Colors.white)),
-        subtitle: Text('$mood · $date', style: TextStyle(color: Colors.grey[500])),
-        trailing: onDelete != null
-            ? IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
-                onPressed: onDelete,
-              )
-            : null,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            border: Border.all(color: AppColors.surfaceBorder, width: 1),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.journal.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: const Icon(Icons.auto_stories_rounded, color: AppColors.journal, size: 20),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: AppTextStyles.body),
+                    Text('$mood · $date', style: AppTextStyles.caption),
+                  ],
+                ),
+              ),
+              if (onDelete != null)
+                InkWell(
+                  onTap: onDelete,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                  child: const Padding(
+                    padding: EdgeInsets.all(4),
+                    child: Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

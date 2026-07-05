@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../dashboard/presentation/widgets/summary_card.dart';
 import '../data/gym_notifier.dart';
 import 'widgets/workout_tile.dart';
+import '../../../shared/widgets/section_header.dart';
+import '../../../shared/widgets/empty_state.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 
 class GymScreen extends ConsumerWidget {
   const GymScreen({super.key});
@@ -17,42 +21,46 @@ class GymScreen extends ConsumerWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1E1E1E),
-          title: const Text('Add Workout', style: TextStyle(color: Colors.white)),
+          title: const Text('Add Workout'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: exerciseController,
-                style: const TextStyle(color: Colors.white),
+                autofocus: true,
                 decoration: const InputDecoration(labelText: 'Exercise'),
               ),
-              TextField(
-                controller: setsController,
-                style: const TextStyle(color: Colors.white),
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Sets'),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: setsController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Sets'),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: TextField(
+                      controller: repsController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Reps'),
+                    ),
+                  ),
+                ],
               ),
-              TextField(
-                controller: repsController,
-                style: const TextStyle(color: Colors.white),
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Reps'),
-              ),
+              const SizedBox(height: AppSpacing.md),
               TextField(
                 controller: caloriesController,
-                style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Calories burned'),
               ),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            ElevatedButton(
               onPressed: () {
                 final exercise = exerciseController.text.trim();
                 final sets = int.tryParse(setsController.text.trim()) ?? 0;
@@ -79,59 +87,59 @@ class GymScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Gym')),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddWorkoutDialog(context, ref),
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Log Workout'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxl,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Gym Dashboard',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
+              const SectionHeader(title: 'Today'),
+              const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   Expanded(
                     child: SummaryCard(
-                      icon: Icons.fitness_center,
+                      icon: Icons.fitness_center_rounded,
                       title: 'Status',
                       value: status,
-                      color: Colors.orangeAccent,
+                      color: AppColors.gym,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: SummaryCard(
-                      icon: Icons.local_fire_department,
+                      icon: Icons.local_fire_department_rounded,
                       title: 'Calories',
                       value: '$calories kcal',
-                      color: Colors.redAccent,
+                      color: AppColors.error,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              const Text(
-                'Recent Workouts',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.xl),
+              const SectionHeader(title: 'Recent Workouts'),
+              const SizedBox(height: AppSpacing.md),
               if (workouts.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Text('No workouts yet. Tap + to add one.', style: TextStyle(color: Colors.grey[500])),
-                ),
-              for (final workout in workouts)
-                WorkoutTile(
-                  exercise: workout.exercise,
-                  detail: '${workout.sets}x${workout.reps}',
-                  onDelete: () => ref.read(gymProvider.notifier).deleteWorkout(workout.id!),
-                ),
+                const EmptyState(
+                  icon: Icons.fitness_center_rounded,
+                  title: 'No workouts logged',
+                  subtitle: 'Tap "Log Workout" to track your training',
+                )
+              else
+                for (final workout in workouts)
+                  WorkoutTile(
+                    exercise: workout.exercise,
+                    detail: '${workout.sets}x${workout.reps}',
+                    calories: '${workout.caloriesBurned}',
+                    onDelete: () => ref.read(gymProvider.notifier).deleteWorkout(workout.id!),
+                  ),
             ],
           ),
         ),

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/water_notifier.dart';
 import 'widgets/water_progress_card.dart';
+import '../../../shared/widgets/section_header.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_spacing.dart';
 
 class WaterScreen extends ConsumerWidget {
   const WaterScreen({super.key});
@@ -13,24 +17,40 @@ class WaterScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Water')),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxl,
+          ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               WaterProgressCard(currentMl: total, goalMl: dailyWaterGoalMl),
-              const SizedBox(height: 24),
-              const Text(
-                'Add Water',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
+              const SizedBox(height: AppSpacing.xl),
+              const SectionHeader(title: 'Quick Add'),
+              const SizedBox(height: AppSpacing.md),
+              Row(
                 children: [100, 250, 500].map((amount) {
-                  return ElevatedButton(
-                    onPressed: () => ref.read(waterProvider.notifier).addWater(amount),
-                    child: Text('+$amount ml'),
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: AppSpacing.sm),
+                      child: OutlinedButton(
+                        onPressed: () => ref.read(waterProvider.notifier).addWater(amount),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(color: AppColors.surfaceBorder),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.water_drop_rounded, color: AppColors.water, size: 20),
+                            const SizedBox(height: 4),
+                            Text('+$amount ml', style: AppTextStyles.body),
+                          ],
+                        ),
+                      ),
+                    ),
                   );
                 }).toList(),
               ),
