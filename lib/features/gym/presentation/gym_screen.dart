@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../dashboard/presentation/widgets/summary_card.dart';
+import 'widgets/recent_workouts_section.dart';
 
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
@@ -21,8 +22,9 @@ class GymScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
-              ),
-              const SizedBox(height: 12),
+               ),
+                const SizedBox(height: 24),
+                const RecentWorkoutsSection(),
               Row(
                 children: [
                   Expanded(
