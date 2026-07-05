@@ -17,11 +17,11 @@ class HabitRepository {
 
   Future<void> updateHabit(Habit habit) async {
     final db = await _databaseService.database;
-    await db.update(
-      'habits',
-      habit.toMap(),
-      where: 'id = ?',
-      whereArgs: [habit.id],
-    );
+    await db.update('habits', habit.toMap(), where: 'id = ?', whereArgs: [habit.id]);
+  }
+
+  Future<void> deleteHabit(int id) async {
+    final db = await _databaseService.database;
+    await db.delete('habits', where: 'id = ?', whereArgs: [id]);
   }
 }

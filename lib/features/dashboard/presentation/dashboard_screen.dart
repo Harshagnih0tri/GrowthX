@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'widgets/greeting_section.dart';
-import 'widgets/today_habits_section.dart';
 import 'widgets/today_progress_section.dart';
+import 'widgets/today_habits_section.dart';
+import 'widgets/quick_access_section.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -15,11 +16,13 @@ class DashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               const GreetingSection(),
-               const SizedBox(height: 24),
-               const TodayProgressSection(),
-               const SizedBox(height: 24),
-               const TodayHabitsSection(),
+              const GreetingSection(),
+              const SizedBox(height: 24),
+              const TodayProgressSection(),
+              const SizedBox(height: 24),
+              const QuickAccessSection(),
+              const SizedBox(height: 24),
+              const TodayHabitsSection(),
             ],
           ),
         ),

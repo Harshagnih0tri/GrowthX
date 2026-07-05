@@ -4,12 +4,14 @@ class HabitRow extends StatelessWidget {
   final String title;
   final bool isDone;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   const HabitRow({
     super.key,
     required this.title,
     required this.isDone,
     this.onTap,
+    this.onDelete,
   });
 
   @override
@@ -30,14 +32,21 @@ class HabitRow extends StatelessWidget {
               color: isDone ? Colors.greenAccent : Colors.grey[500],
             ),
             const SizedBox(width: 12),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.white,
-                decoration: isDone ? TextDecoration.lineThrough : null,
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.white,
+                  decoration: isDone ? TextDecoration.lineThrough : null,
+                ),
               ),
             ),
+            if (onDelete != null)
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                onPressed: onDelete,
+              ),
           ],
         ),
       ),
