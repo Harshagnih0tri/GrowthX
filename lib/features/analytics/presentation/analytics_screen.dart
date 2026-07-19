@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'study_analytics_screen.dart';
+import 'weight_analytics_screen.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -20,7 +22,10 @@ class AnalyticsScreen extends StatelessWidget {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxl,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.xxl,
           ),
           children: [
             _AnalyticsTile(
@@ -30,26 +35,39 @@ class AnalyticsScreen extends StatelessWidget {
               color: AppColors.study,
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const StudyAnalyticsScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const StudyAnalyticsScreen(),
+                ),
               ),
             ),
+
             const SizedBox(height: AppSpacing.md),
+
             _AnalyticsTile(
               icon: Icons.monitor_weight_rounded,
               title: 'Weight',
               subtitle: 'Trend and change over time',
               color: AppColors.weight,
-              onTap: () => _openComingSoon(context, 'Weight'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const WeightAnalyticsScreen(),
+                ),
+              ),
             ),
+
             const SizedBox(height: AppSpacing.md),
+
             _AnalyticsTile(
               icon: Icons.water_drop_rounded,
               title: 'Water',
-              subtitle: 'Intake history and goal rate',
+              subtitle: 'Daily intake and goal progress',
               color: AppColors.water,
               onTap: () => _openComingSoon(context, 'Water'),
             ),
+
             const SizedBox(height: AppSpacing.md),
+
             _AnalyticsTile(
               icon: Icons.fitness_center_rounded,
               title: 'Gym',
@@ -57,7 +75,9 @@ class AnalyticsScreen extends StatelessWidget {
               color: AppColors.gym,
               onTap: () => _openComingSoon(context, 'Gym'),
             ),
+
             const SizedBox(height: AppSpacing.md),
+
             _AnalyticsTile(
               icon: Icons.check_circle_rounded,
               title: 'Habits',
@@ -99,7 +119,10 @@ class _AnalyticsTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            border: Border.all(color: AppColors.surfaceBorder, width: 1),
+            border: Border.all(
+              color: AppColors.surfaceBorder,
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
@@ -107,9 +130,14 @@ class _AnalyticsTile extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusSm),
                 ),
-                child: Icon(icon, color: color, size: 22),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
@@ -121,11 +149,14 @@ class _AnalyticsTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textTertiary,
+              ),
             ],
           ),
         ),
       ),
     );
   }
-}
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
