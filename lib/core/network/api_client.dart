@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'api_constants.dart';
+import 'auth_interceptor.dart';
 
 class ApiClient {
   ApiClient._();
@@ -16,5 +17,5 @@ class ApiClient {
         "Accept": "application/json",
       },
     ),
-  );
+  )..interceptors.add(AuthInterceptor());
 }
