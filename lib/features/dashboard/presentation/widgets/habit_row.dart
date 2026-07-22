@@ -4,70 +4,80 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 class HabitRow extends StatelessWidget {
-  final String title;
-  final bool isDone;
-  final VoidCallback? onTap;
+  final String name;
+  final String? description;
+  final String frequency;
   final VoidCallback? onDelete;
 
   const HabitRow({
     super.key,
-    required this.title,
-    required this.isDone,
-    this.onTap,
+    required this.name,
+    this.description,
+    required this.frequency,
     this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-            border: Border.all(color: AppColors.surfaceBorder, width: 1),
+        border: Border.all(color: AppColors.surfaceBorder, width: 1),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.habit,
+            ),
           ),
-          child: Row(
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isDone ? AppColors.habit : Colors.transparent,
-                  border: Border.all(
-                    color: isDone ? AppColors.habit : AppColors.textTertiary,
-                    width: 2,
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: AppTextStyles.body),
+                if (description != null && description!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(description!, style: AppTextStyles.bodyMuted),
                   ),
-                ),
-                child: isDone
-                    ? const Icon(Icons.check, size: 14, color: Colors.black)
-                    : null,
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppTextStyles.body.copyWith(
-                    color: isDone ? AppColors.textTertiary : AppColors.textPrimary,
-                    decoration: isDone ? TextDecoration.lineThrough : null,
-                  ),
-                ),
-              ),
-              if (onDelete != null)
-                IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
-                  onPressed: onDelete,
-                ),
-            ],
+              ],
+            ),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.habit.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            ),
+            child: Text(
+              frequency,
+              style: AppTextStyles.bodyMuted.copyWith(
+                color: AppColors.habit,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          if (onDelete != null)
+            IconButton(
+              icon: const Icon(
+                Icons.delete_outline_rounded,
+                color: AppColors.error,
+                size: 20,
+              ),
+              onPressed: onDelete,
+            ),
+        ],
       ),
     );
   }

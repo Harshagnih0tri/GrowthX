@@ -4,42 +4,81 @@ import '../../dashboard/presentation/widgets/habit_row.dart';
 import '../data/habit_notifier.dart';
 import '../../../shared/widgets/section_header.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 
 class HabitsScreen extends ConsumerWidget {
   const HabitsScreen({super.key});
 
   void _showAddHabitDialog(BuildContext context, WidgetRef ref) {
-    final titleController = TextEditingController();
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+    String selectedFrequency = 'daily';
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('New Habit'),
-          content: TextField(
-            controller: titleController,
-            autofocus: true,
-            decoration: const InputDecoration(labelText: 'Habit name'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final title = titleController.text.trim();
-                if (title.isNotEmpty) {
-                  ref.read(habitProvider.notifier).addHabit(title);
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('Add'),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('New Habit'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    autofocus: true,
+                    decoration: const InputDecoration(labelText: 'Habit name'),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Description (optional)',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedFrequency,
+                    decoration: const InputDecoration(labelText: 'Frequency'),
+                    items: const [
+                      DropdownMenuItem(value: 'daily', child: Text('Daily')),
+                      DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
+                      DropdownMenuItem(
+                        value: '3x per week',
+                        child: Text('3x per week'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => selectedFrequency = value);
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final name = nameController.text.trim();
+                    if (name.isNotEmpty) {
+                      final description = descriptionController.text.trim();
+                      ref.read(habitProvider.notifier).addHabit(
+                            name: name,
+                            description: description.isEmpty ? null : description,
+                            frequency: selectedFrequency,
+                          );
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('Add'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -47,8 +86,7 @@ class HabitsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final habits = ref.watch(habitProvider);
-    final doneCount = habits.where((h) => h.isDone).length;
+    final habitsAsync = ref.watch(habitProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Habits')),
@@ -58,60 +96,52 @@ class HabitsScreen extends ConsumerWidget {
         label: const Text('New Habit'),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxl,
+        child: habitsAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline_rounded, size: 48),
+                  const SizedBox(height: AppSpacing.md),
+                  Text('Could not load habits.\n$error', textAlign: TextAlign.center),
+                  const SizedBox(height: AppSpacing.md),
+                  ElevatedButton(
+                    onPressed: () => ref.read(habitProvider.notifier).loadHabits(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (habits.isNotEmpty)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  margin: const EdgeInsets.only(bottom: AppSpacing.xl),
-                  decoration: BoxDecoration(
-                    color: AppColors.habit.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.habit.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.local_fire_department_rounded, color: AppColors.habit),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('$doneCount of ${habits.length} completed', style: AppTextStyles.title),
-                          Text('Keep the streak going', style: AppTextStyles.bodyMuted),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              const SectionHeader(title: 'All Habits'),
-              const SizedBox(height: AppSpacing.md),
-              if (habits.isEmpty)
-                const EmptyState(
-                  icon: Icons.check_circle_outline_rounded,
-                  title: 'No habits yet',
-                  subtitle: 'Tap "New Habit" to start building your routine',
-                )
-              else
-                for (int i = 0; i < habits.length; i++)
-                  HabitRow(
-                    title: habits[i].title,
-                    isDone: habits[i].isDone,
-                    onTap: () => ref.read(habitProvider.notifier).toggleHabit(i),
-                    onDelete: () => ref.read(habitProvider.notifier).deleteHabit(habits[i].id!),
-                  ),
-            ],
+          data: (habits) => SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxl,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionHeader(title: 'All Habits'),
+                const SizedBox(height: AppSpacing.md),
+                if (habits.isEmpty)
+                  const EmptyState(
+                    icon: Icons.check_circle_outline_rounded,
+                    title: 'No habits yet',
+                    subtitle: 'Tap "New Habit" to start building your routine',
+                  )
+                else
+                  for (final habit in habits)
+                    HabitRow(
+                      name: habit.name,
+                      description: habit.description,
+                      frequency: habit.frequency,
+                      onDelete: () =>
+                          ref.read(habitProvider.notifier).deleteHabit(habit.id),
+                    ),
+              ],
+            ),
           ),
         ),
       ),

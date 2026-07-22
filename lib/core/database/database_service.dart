@@ -24,7 +24,6 @@ class DatabaseService {
       path,
       version: 6,
       onCreate: (db, version) async {
-        await _createHabitsTable(db);
         await _createStudySessionsTable(db);
         await _createWorkoutsTable(db);
         await _createWeightEntriesTable(db);
@@ -39,16 +38,6 @@ class DatabaseService {
         if (oldVersion < 6) await _createJournalEntriesTable(db);
       },
     );
-  }
-
-  Future<void> _createHabitsTable(Database db) async {
-    await db.execute('''
-      CREATE TABLE habits(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        isDone INTEGER NOT NULL DEFAULT 0
-      )
-    ''');
   }
 
   Future<void> _createStudySessionsTable(Database db) async {

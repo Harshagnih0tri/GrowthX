@@ -11,8 +11,7 @@ class TodayHabitsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final habits = ref.watch(habitProvider);
-    final doneCount = habits.where((h) => h.isDone).length;
+    final habitsAsync = ref.watch(habitProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,23 +23,37 @@ class TodayHabitsSection extends ConsumerWidget {
               context,
               MaterialPageRoute(builder: (_) => const HabitsScreen()),
             ),
-            child: Text(habits.isEmpty ? 'Manage' : '$doneCount/${habits.length}'),
+            child: const Text('Manage'),
           ),
         ),
         const SizedBox(height: 12),
-        if (habits.isEmpty)
-          const EmptyState(
-            icon: Icons.check_circle_outline_rounded,
-            title: 'No habits yet',
-            subtitle: 'Tap Manage to create your first habit',
-          )
-        else
-          for (int i = 0; i < habits.length; i++)
-            HabitRow(
-              title: habits[i].title,
-              isDone: habits[i].isDone,
-              onTap: () => ref.read(habitProvider.notifier).toggleHabit(i),
-            ),
+        habitsAsync.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stackTrace) => const EmptyState(
+            icon: Icons.error_outline_rounded,
+            title: 'Could not load habits',
+            subtitle: 'Tap Manage to try again',
+          ),
+          data: (habits) => habits.isEmpty
+              ? const EmptyState(
+                  icon: Icons.check_circle_outline_rounded,
+                  title: 'No habits yet',
+                  subtitle: 'Tap Manage to create your first habit',
+                )
+              : Column(
+                  children: [
+                    for (final habit in habits)
+                      HabitRow(
+                        name: habit.name,
+                        description: habit.description,
+                        frequency: habit.frequency,
+                      ),
+                  ],
+                ),
+        ),
       ],
     );
   }

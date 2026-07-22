@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'widgets/greeting_section.dart';
 import 'widgets/today_progress_section.dart';
-// import 'widgets/today_habits_section.dart';
+import 'widgets/today_habits_section.dart';
 import 'widgets/quick_access_section.dart';
 import '../../../core/theme/app_spacing.dart';
 
@@ -27,10 +27,8 @@ class DashboardScreen extends StatelessWidget {
               const TodayProgressSection(),
               const SizedBox(height: AppSpacing.xl),
               const QuickAccessSection(),
-
-              // TEMPORARILY DISABLED
-              // const SizedBox(height: AppSpacing.xl),
-              // const TodayHabitsSection(),
+              const SizedBox(height: AppSpacing.xl),
+              const TodayHabitsSection(),
             ],
           ),
         ),
