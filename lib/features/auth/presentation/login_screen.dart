@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginScreen extends StatefulWidget {
+import '../../../core/router/app_shell.dart';
+import 'auth_provider.dart';
+
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _emailController = TextEditingController();
@@ -22,14 +26,44 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      await ref.read(authProvider.notifier).login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const AppShell(),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("GrowthX"),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
@@ -54,6 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 TextFormField(
                   controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: "Email",
                     border: OutlineInputBorder(),
@@ -62,6 +97,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return "Enter your email";
                     }
+
+                    if (!value.contains("@")) {
+                      return "Enter a valid email";
+                    }
+
                     return null;
                   },
                 ),
@@ -91,6 +131,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return "Enter your password";
                     }
+
+                    if (value.length < 6) {
+                      return "Password must be at least 6 characters";
+                    }
+
                     return null;
                   },
                 ),
@@ -98,8 +143,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32),
 
                 FilledButton(
-                  onPressed: () {},
-                  child: const Text("Login"),
+                  onPressed: authState.isLoading ? null : _login,
+                  child: authState.isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text("Login"),
                 ),
               ],
             ),

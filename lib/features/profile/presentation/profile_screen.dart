@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../analytics/presentation/analytics_screen.dart';
+import '../../auth/presentation/login_screen.dart';
+import '../../../core/storage/token_storage.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -14,27 +16,63 @@ class ProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.xxl,
+            AppSpacing.lg,
+            AppSpacing.xl,
+            AppSpacing.lg,
+            AppSpacing.xxl,
           ),
           child: Column(
             children: [
               const CircleAvatar(
                 radius: 40,
                 backgroundColor: AppColors.primary,
-                child: Icon(Icons.person, size: 40, color: Colors.white),
+                child: Icon(
+                  Icons.person,
+                  size: 40,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
-              const Text('Harsh', style: AppTextStyles.headline),
+              const Text(
+                'Harsh',
+                style: AppTextStyles.headline,
+              ),
               const SizedBox(height: AppSpacing.xxl),
+
               _ProfileMenuTile(
                 icon: Icons.bar_chart_rounded,
                 title: 'Analytics',
                 subtitle: 'View your progress and trends',
                 color: AppColors.primary,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
-                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AnalyticsScreen(),
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: AppSpacing.md),
+
+              _ProfileMenuTile(
+                icon: Icons.logout_rounded,
+                title: 'Logout',
+                subtitle: 'Sign out of your account',
+                color: Colors.red,
+                onTap: () async {
+                  await TokenStorage.deleteToken();
+
+                  if (!context.mounted) return;
+
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => const LoginScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
               ),
             ],
           ),
@@ -72,7 +110,10 @@ class _ProfileMenuTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            border: Border.all(color: AppColors.surfaceBorder, width: 1),
+            border: Border.all(
+              color: AppColors.surfaceBorder,
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
@@ -80,21 +121,36 @@ class _ProfileMenuTile extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                  borderRadius: BorderRadius.circular(
+                    AppSpacing.radiusSm,
+                  ),
                 ),
-                child: Icon(icon, color: color, size: 22),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: AppTextStyles.title),
-                    Text(subtitle, style: AppTextStyles.bodyMuted),
+                    Text(
+                      title,
+                      style: AppTextStyles.title,
+                    ),
+                    Text(
+                      subtitle,
+                      style: AppTextStyles.bodyMuted,
+                    ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textTertiary,
+              ),
             ],
           ),
         ),

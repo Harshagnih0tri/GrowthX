@@ -8,11 +8,24 @@ class TokenStorage {
   static const String _tokenKey = 'access_token';
 
   static Future<void> saveToken(String token) async {
+    print("Saving Token...");
+    print(token);
+
     await _storage.write(key: _tokenKey, value: token);
+
+    final saved = await _storage.read(key: _tokenKey);
+
+    print("Saved Token:");
+    print(saved);
   }
 
   static Future<String?> getToken() async {
-    return await _storage.read(key: _tokenKey);
+    final token = await _storage.read(key: _tokenKey);
+
+    print("Reading Token:");
+    print(token);
+
+    return token;
   }
 
   static Future<void> deleteToken() async {

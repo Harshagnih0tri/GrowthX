@@ -18,6 +18,13 @@ class AuthRepository {
 
     await TokenStorage.saveToken(loginResponse.accessToken);
 
+    final savedToken = await TokenStorage.getToken();
+
+    print("========================================");
+    print("TOKEN AFTER SAVE:");
+    print(savedToken);
+    print("========================================");
+
     return loginResponse;
   }
 }

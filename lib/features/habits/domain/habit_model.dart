@@ -1,5 +1,5 @@
 class Habit {
-  final int? id;
+  final String? id;
   final String title;
   final bool isDone;
 
@@ -9,7 +9,11 @@ class Habit {
     required this.isDone,
   });
 
-  Habit copyWith({int? id, String? title, bool? isDone}) {
+  Habit copyWith({
+    String? id,
+    String? title,
+    bool? isDone,
+  }) {
     return Habit(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -17,11 +21,18 @@ class Habit {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {'title': title, 'isDone': isDone ? 1 : 0};
+  factory Habit.fromJson(Map<String, dynamic> json) {
+    return Habit(
+      id: json["id"]?.toString(),
+      title: json["title"] ?? "",
+      isDone: json["is_done"] ?? false,
+    );
   }
 
-  factory Habit.fromMap(Map<String, dynamic> map) {
-    return Habit(id: map['id'], title: map['title'], isDone: map['isDone'] == 1);
+  Map<String, dynamic> toJson() {
+    return {
+      "title": title,
+      "is_done": isDone,
+    };
   }
 }

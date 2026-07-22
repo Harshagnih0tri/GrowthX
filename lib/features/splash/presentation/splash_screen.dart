@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/storage/token_storage.dart';
 import '../../../core/router/app_shell.dart';
+import '../../../core/storage/token_storage.dart';
 import '../../auth/presentation/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,6 +20,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkAuthentication() async {
     final token = await TokenStorage.getToken();
+
+    print("========================================");
+    print("TOKEN ON SPLASH:");
+    print(token);
+    print("========================================");
 
     if (!mounted) return;
 
